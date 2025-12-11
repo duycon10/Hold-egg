@@ -1,0 +1,53 @@
+local Players = game:GetService("Players")
+người chơi cục bộ = Players.LocalPlayer
+
+local BLOCKED_TOOL_NAME = "Protein Egg"
+
+hàm cục bộ neutralTool(tool)
+    for _, desc in ipairs(tool:GetDescendants()) do
+        nếu desc:IsA("Script") hoặc desc:IsA("LocalScript") thì
+            -- Si no quieres destruirlos, simplemente los deshabilitas:
+            nếu desc:IsA("LocalScript") thì
+                mô tả.Đã vô hiệu hóa = đúng
+            khác
+                mô tả: Hủy()
+            kết thúc
+        kết thúc
+        nếu desc:IsA("RemoteEvent") thì
+            pcall(function()
+                desc.FireServer = function() end
+            kết thúc)
+        kết thúc
+    kết thúc
+kết thúc
+
+hàm cục bộ onToolEquipped(tool)
+    nếu tool.Name == BLOCKED_TOOL_NAME thì
+        neutralTool(tool)
+    kết thúc
+kết thúc
+
+hàm cục bộ monitorContainer(container)
+    for _, tool in ipairs(container:GetChildren()) do
+        nếu tool:IsA("Tool") và tool.Name == BLOCKED_TOOL_NAME thì
+            neutralTool(tool)
+        kết thúc
+    kết thúc
+    container.ChildAdded:Connect(function(child)
+        nếu child:IsA("Tool") và child.Name == BLOCKED_TOOL_NAME thì
+            task.defer(function()
+                neutralTool(child)
+            kết thúc)
+            child.Equipped:Connect(onToolEquipped)
+        kết thúc
+    kết thúc)
+kết thúc
+
+player.CharacterAdded:Connect(function(char)
+    monitorContainer(player.Backpack)
+    monitorContainer(char)
+kết thúc)
+nếu player.Character thì
+    monitorContainer(player.Backpack)
+    monitorContainer(player.Character)
+kết thúc
